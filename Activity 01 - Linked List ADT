@@ -1,0 +1,143 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct node {
+    int data;
+    struct node* next;
+} Node;
+
+Node* createNode(int value);
+void displayNodes(Node *head);
+void insertAtBeginning(Node **head, int value);
+void insertAtEnd(Node **head, int value);
+void insertAtPosition(Node **head, int value, int pos);
+void deleteAtBeginning(Node **head);
+void deleteAtEnd(Node **head);
+void deleteAtPosition(Node **head, int pos);
+int listLength(Node *head);
+
+int main(void) {
+    Node *head = NULL;
+    return 0;
+}
+
+Node* createNode(int value) {
+    Node *n = (Node*)malloc(sizeof(Node));
+    if (n == NULL) return NULL;
+    n->data = value;
+    n->next = NULL;
+    return n;
+}
+
+void displayNodes(Node *head) {
+    if (head == NULL) {
+        printf("\nLa lista esta VACIA.\n");
+        return;
+    }
+    printf("\nLista: ");
+    Node *aux = head;
+    while (aux != NULL) {
+        printf("%d ", aux->data);
+        aux = aux->next;
+    }
+    printf("\n");
+}
+
+void insertAtBeginning(Node **head, int value) {
+    Node *n = createNode(value);
+    if (n == NULL) return;
+    n->next = *head;
+    *head = n;
+}
+
+void insertAtEnd(Node **head, int value) {
+    Node *n = createNode(value);
+    if (n == NULL) return;
+    if (*head == NULL) {
+        *head = n;
+        return;
+    }
+    Node *aux = *head;
+    while (aux->next != NULL) aux = aux->next;
+    aux->next = n;
+}
+
+void insertAtPosition(Node **head, int value, int pos) {
+    if (pos <= 1 || *head == NULL) {
+        insertAtBeginning(head, value);
+        return;
+    }
+    int len = listLength(*head);
+    if (pos > len + 1) {
+        insertAtEnd(head, value);
+        return;
+    }
+    Node *aux = *head;
+    int current = 1;
+    while (aux != NULL && current < pos - 1) {
+        aux = aux->next;
+        current++;
+    }
+    if (aux == NULL) {
+        insertAtEnd(head, value);
+        return;
+    }
+    Node *n = createNode(value);
+    if (n == NULL) return;
+    n->next = aux->next;
+    aux->next = n;
+}
+
+void deleteAtBeginning(Node **head) {
+    if (*head == NULL) return;
+    Node *toDelete = *head;
+    *head = (*head)->next;
+    free(toDelete);
+}
+
+void deleteAtEnd(Node **head) {
+    if (*head == NULL) return;
+    if ((*head)->next == NULL) {
+        free(*head);
+        *head = NULL;
+        return;
+    }
+    Node *prev = *head;
+    Node *curr = (*head)->next;
+    while (curr->next != NULL) {
+        prev = curr;
+        curr = curr->next;
+    }
+    prev->next = NULL;
+    free(curr);
+}
+
+void deleteAtPosition(Node **head, int pos) {
+    if (*head == NULL) return;
+    if (pos <= 1) {
+        deleteAtBeginning(head);
+        return;
+    }
+    int len = listLength(*head);
+    if (pos > len) return;
+    Node *prev = *head;
+    int current = 1;
+    while (prev != NULL && current < pos - 1) {
+        prev = prev->next;
+        current++;
+    }
+    if (prev == NULL || prev->next == NULL) return;
+    Node *toDelete = prev->next;
+    prev->next = toDelete->next;
+    free(toDelete);
+}
+
+int listLength(Node *head) {
+    int count = 0;
+    Node *aux = head;
+    while (aux != NULL) {
+        count++;
+        aux = aux->next;
+    }
+    return count;
+}
